@@ -1,7 +1,6 @@
-var express = require('express');
+const express = require('express');
 const Obj = require('../data/class');
-var router = express.Router();
-
+const router = express.Router();
 //middleware
 
 const listObj = [];
