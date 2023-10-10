@@ -1,6 +1,9 @@
 const express = require("express");
+const app = express();
 const { Post } = require("../models/post.model");
 const router = express.Router();
+const jwt = require("jsonwebtoken")
+const secretKey = "bien"
 
 router.get("/get-all", (req, res) => {
     try {
@@ -11,12 +14,17 @@ router.get("/get-all", (req, res) => {
     }
 })
 
-router.post("/create/:id", async (req, res) => {
+//Create Post using Token
+router.post("/create", async (req, res) => {
     try {
-        const id = req.params.id
+        const accessToken = req.cookies.accessToken
+        const tokenDecode = jwt.verify(accessToken, secretKey)
+        const id = tokenDecode._id
+        console.log(tokenDecode);
         const postData = req.body
         const newPost = Post({ ...postData, user: id })
         await newPost.save()
+        // console.log(tokenDecode);
         res.status(200).send(newPost)
     } catch (error) {
         res.status(500).send(error)
@@ -38,11 +46,6 @@ router.put("/update/:id", async (req, res) => {
 router.delete("/delete/:id", async (req, res) => {
     try {
         const id = req.params.id
-        // const deletePost = await Post.findById(id)
-        // console.log(deletePost);
-        // if (!deletePost) {
-        //     return res.status(404).send("Not Found");
-        // }
         await Post.deleteOne({ _id: id })
         res.status(200).send("Delete True")
     } catch (error) {
