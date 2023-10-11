@@ -5,9 +5,9 @@ const router = express.Router();
 const jwt = require("jsonwebtoken")
 const secretKey = "bien"
 
-router.get("/get-all", (req, res) => {
+router.get("/get-all", async (req, res) => {
     try {
-        const lisPost = Post.find({})
+        const lisPost = await Post.find({})
         res.status(200).send(lisPost)
     } catch (error) {
         res.status(500).send(error)
@@ -20,9 +20,9 @@ router.post("/create", async (req, res) => {
         const accessToken = req.cookies.accessToken
         const tokenDecode = jwt.verify(accessToken, secretKey)
         const id = tokenDecode._id
-        console.log(tokenDecode);
+        // console.log(tokenDecode);
         const postData = req.body
-        const newPost = Post({ ...postData, user: id })
+        const newPost = Post({ ...postData, user: { _id: id, email: tokenDecode.email, username: tokenDecode.username } })
         await newPost.save()
         // console.log(tokenDecode);
         res.status(200).send(newPost)
